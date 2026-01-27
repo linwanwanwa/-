@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>长沙第一天行程 - 精准日落版（地铁优先）</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        body {
+            background-color: #f8f9fa;
+            padding: 10px;
+            line-height: 1.5;
+        }
+        .container {
+            max-width: 750px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        /* 头部样式 */
+        .header {
+            background: linear-gradient(90deg, #ff8a65, #ff5722);
+            color: #fff;
+            padding: 20px 15px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 20px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        /* 核心信息 */
+        .core-info {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .core-info h2 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .core-info h2::before {
+            content: "📌";
+            margin-right: 8px;
+        }
+        .core-info ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .core-info li {
+            background: #f5f5f5;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+        .core-info li span {
+            font-weight: bold;
+            color: #ff5722;
+        }
+        /* 地图容器 - 响应式适配 */
+        .map-box {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .map-box h2 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .map-box h2::before {
+            content: "🗺️";
+            margin-right: 8px;
+        }
+        .map-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 75%; /* 响应式长宽比，手机端适配 */
+            height: 0;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+        .map-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        /* 行程表格 - 手机端可横向滑动 */
+        .trip-box {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .trip-box h2 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .trip-box h2::before {
+            content: "🕒";
+            margin-right: 8px;
+        }
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto; /* 手机端横向滑动，无横向滚动 */
+            -webkit-overflow-scrolling: touch; /* 苹果手机顺滑滚动 */
+        }
+        .trip-table {
+            width: 100%;
+            min-width: 600px;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .trip-table th {
+            background: #f5f5f5;
+            color: #333;
+            font-weight: 600;
+            padding: 10px 6px;
+            text-align: left;
+            white-space: nowrap;
+            border-bottom: 2px solid #eee;
+        }
+        .trip-table td {
+            padding: 10px 6px;
+            color: #666;
+            border-bottom: 1px solid #eee;
+            white-space: nowrap;
+        }
+        .trip-table .highlight {
+            font-weight: bold;
+            color: #ff5722;
+        }
+        /* 实用贴士 */
+        .tips-box {
+            padding: 15px;
+        }
+        .tips-box h2 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .tips-box h2::before {
+            content: "💡";
+            margin-right: 8px;
+        }
+        .tips-box ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .tips-box li {
+            font-size: 13px;
+            color: #666;
+            padding-left: 20px;
+            position: relative;
+        }
+        .tips-box li::before {
+            content: "✅";
+            position: absolute;
+            left: 0;
+            top: 2px;
+            font-size: 12px;
+        }
+        /* 底部小提示 */
+        .footer {
+            padding: 10px 15px;
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            background: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>长沙第一天精准日落版行程</h1>
+            <p>13:44长沙南站抵达 | 地铁优先 | 18:00橘子洲日落打卡</p>
+        </div>
+
+        <!-- 核心出行信息 -->
+        <div class="core-info">
+            <h2>核心信息</h2>
+            <ul>
+                <li><span>总交通费</span>：50元（地铁10+小火车40）</li>
+                <li><span>用餐</span>：1.5小时 | 人均80-100元</li>
+                <li><span>日落时间</span>：18:00（橘子洲头）</li>
+                <li><span>住宿</span>：五一广场国金街轻居酒店</li>
+                <li><span>出行码</span>：湘行一卡通/支付宝乘车码</li>
+            </ul>
+        </div>
+
+        <!-- 高德地图（优化后：默认显示所有6个行程点位） -->
+        <div class="map-box">
+            <h2>行程点位地图</h2>
+            <div class="map-container">
+                <!-- 调整zoom=13，center=112.9785,28.1965，默认完整显示所有标注点 -->
+                <iframe src="https://amap.com/embed?zoom=13&center=112.9785,28.1965&markers=112.996881,28.198818,长沙南站;112.983428,28.200329,五一广场国金街轻居酒店;112.980966,28.197967,林小兜有钳;112.985288,28.202199,IFS国金中心;112.965238,28.192058,橘子洲头;112.980122,28.199269,黄兴南路步行街" allowfullscreen></iframe>
+            </div>
+        </div>
+
+        <!-- 行程时间轴表格 -->
+        <div class="trip-box">
+            <h2>行程明细（地铁+步行）</h2>
+            <div class="table-wrap">
+                <table class="trip-table">
+                    <thead>
+                        <tr>
+                            <th>时间段</th>
+                            <th>行程节点</th>
+                            <th>交通方式</th>
+                            <th>耗时</th>
+                            <th>费用</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>13:44-14:04</td>
+                            <td>长沙南站 → 五一广场站</td>
+                            <td>地铁2号线（梅溪湖西方向）</td>
+                            <td class="highlight">约20分钟</td>
+                            <td class="highlight">4元</td>
+                        </tr>
+                        <tr>
+                            <td>14:04-14:09</td>
+                            <td>五一广场站 → 酒店</td>
+                            <td>步行（1号口出，黄兴中路）</td>
+                            <td class="highlight">约5分钟</td>
+                            <td class="highlight">免费</td>
+                        </tr>
+                        <tr>
+                            <td>14:09-14:39</td>
+                            <td>酒店收拾行李</td>
+                            <td>-</td>
+                            <td class="highlight">30分钟</td>
+                            <td class="highlight">免费</td>
+                        </tr>
+                        <tr>
+                            <td>14:39-14:47</td>
+                            <td>酒店 → 林小兜有钳</td>
+                            <td>步行（坡子街方向）</td>
+                            <td class="highlight">约8分钟</td>
+                            <td class="highlight">免费</td>
+                        </tr>
+                        <tr>
+                            <td>14:47-16:17</td>
+                            <td>林小兜有钳用餐</td>
+                            <td>-</td>
+                            <td class="highlight">1.5小时</td>
+                            <td class="highlight">人均80-100元</td>
+                        </tr>
+                        <tr>
+                            <td>16:17-16:22</td>
+                            <td>林小兜有钳 → IFS国金中心</td>
+                            <td>步行（黄兴中路往北）</td>
+                            <td class="highlight">约5分钟</td>
+                            <td class="highlight">免费</td>
+                        </tr>
+                        <tr>
+                            <td>16:22-17:22</td>
+                            <td>IFS国金中心打卡</td>
+                            <td>-</td>
+                            <td class="highlight">约1小时</td>
+                            <td class="highlight">免费</td>
+                        </tr>
+                        <tr>
+                            <td>17:22-17:42</td>
+                            <td>IFS → 橘子洲站</td>
+                            <td>步行+地铁2号线（光达方向）</td>
+                            <td class="highlight">约20分钟</td>
+                            <td class="highlight">3元</td>
+                        </tr>
+                        <tr>
+                            <td>17:42-17:52</td>
+                            <td>橘子洲站 → 青年毛泽东雕像</td>
+                            <td>观光小火车（往返）</td>
+                            <td class="highlight">约10分钟</td>
+                            <td class="highlight">40元</td>
+                        </tr>
+                        <tr>
+                            <td>17:52-19:22</td>
+                            <td>橘子洲头游玩（日落+夜景）</td>
+                            <td>小火车+步行</td>
+                            <td class="highlight">约1.5小时</td>
+                            <td class="highlight">免费</td>
+                        </tr>
+                        <tr>
+                            <td>19:22-19:47</td>
+                            <td>橘子洲站 → 黄兴广场站</td>
+                            <td>地铁2号线（梅溪湖西方向）</td>
+                            <td class="highlight">约25分钟</td>
+                            <td class="highlight">3元</td>
+                        </tr>
+                        <tr>
+                            <td>19:47-21:17</td>
+                            <td>黄兴南路步行街逛吃</td>
+                            <td>步行</td>
+                            <td class="highlight">约1.5小时</td>
+                            <td class="highlight">免费</td>
+                        </tr>
+                        <tr>
+                            <td>21:17-21:27</td>
+                            <td>步行街 → 酒店</td>
+                            <td>步行（黄兴中路往北）</td>
+                            <td class="highlight">约10分钟</td>
+                            <td class="highlight">免费</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 实用贴士 -->
+        <div class="tips-box">
+            <h2>出行实用贴士</h2>
+            <ul>
+                <li>橘子洲需提前在「岳麓山橘子洲旅游区」公众号预约，无预约不可入园</li>
+                <li>林小兜有钳提前大众点评取号，减少排队，不吃辣备注「微辣/免辣」</li>
+                <li>IFS打卡7楼KAWS雕塑+5楼空中花园，傍晚光线柔和，拍照无需滤镜</li>
+                <li>橘子洲小火车必坐，全程5公里，步行耗时过久会错过日落</li>
+                <li>茶颜悦色五一广场商圈随处可见，推荐幽兰拿铁、声声乌龙，可免费加奶油</li>
+                <li>夜间步行沿主干道走，黄兴路/五一大道人流大，安全且顺路</li>
+            </ul>
+        </div>
+
+        <!-- 底部 -->
+        <div class="footer">
+            本行程为精准日落版 | 全程地铁优先 | 手机离线可看 · 地图联网交互
+        </div>
+    </div>
+</body>
+</html>
