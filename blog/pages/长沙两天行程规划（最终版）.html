@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>长沙两日游行程（单文件切换版）</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            padding-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        /* 头部样式 */
+        .header {
+            background: linear-gradient(90deg, #ff8a65, #ff5722);
+            color: #fff;
+            padding: 25px 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        /* 返回主页按钮 */
+        .home-btn {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .home-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* 菜单栏样式（核心切换入口） */
+        .menu-bar {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            margin: 0 15px 20px;
+            overflow: hidden;
+        }
+
+        .menu-list {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 0 10px;
+        }
+
+        .menu-item {
+            padding: 15px 25px;
+            text-align: center;
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .menu-item.active {
+            color: #fff;
+            background-color: #ff5722;
+        }
+
+        .menu-item:hover:not(.active) {
+            background-color: #fef6f0;
+            color: #ff5722;
+        }
+
+        /* 【醒目预约提醒卡片】核心高亮样式 */
+        .reserve-alert {
+            background-color: #fff2f0;
+            border: 2px solid #ff4d4f;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .reserve-alert h3 {
+            color: #ff4d4f;
+            font-size: 16px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .reserve-alert h3::before {
+            content: "⚠️";
+            margin-right: 8px;
+        }
+
+        .reserve-alert p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 5px;
+        }
+
+        .reserve-alert span {
+            color: #ff4d4f;
+            font-weight: 600;
+        }
+
+        /* 行程板块样式（核心：默认隐藏，仅激活的显示） */
+        .trip-section {
+            display: none; /* 所有行程板块默认隐藏 */
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            margin: 0 15px 20px;
+            padding: 20px 15px;
+        }
+
+        .trip-section.active {
+            display: block; /* 激活的板块显示 */
+        }
+
+        /* 通用子板块样式 */
+        .sub-section {
+            margin-bottom: 25px;
+        }
+
+        .sub-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .sub-section h2 {
+            font-size: 18px;
+            color: #ff5722;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .sub-section h3 {
+            font-size: 16px;
+            color: #333;
+            margin: 12px 0 8px;
+        }
+
+        .sub-section p, .sub-section li {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        .sub-section ul {
+            list-style-position: inside;
+            margin-left: 10px;
+        }
+
+        /* 表格样式 */
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        .trip-table {
+            width: 100%;
+            min-width: 600px;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .trip-table th {
+            background-color: #f8f9fa;
+            color: #333;
+            font-weight: 600;
+            padding: 10px 8px;
+            text-align: left;
+            border-bottom: 2px solid #eee;
+        }
+
+        .trip-table td {
+            color: #666;
+            padding: 10px 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .trip-table tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        .highlight {
+            color: #ff5722;
+            font-weight: 500;
+        }
+
+        /* 行程总览卡片 */
+        .overview-card {
+            background-color: #fef6f0;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 10px 0;
+        }
+
+        .overview-card p {
+            color: #d84315 !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- 头部 -->
+    <div class="header">
+        <a href="index.html" class="home-btn">← 返回主页</a>
+        <h1>长沙两日游行程（网红打卡+人文风光）</h1>
+        <p>地铁优先 · 步行衔接 · 离线可用 · 宽松不赶场</p>
+    </div>
+
+    <!-- 核心切换菜单栏 -->
+    <div class="menu-bar">
+        <div class="menu-list">
+            <button class="menu-item active" data-target="day1-section">第一天行程</button>
+            <button class="menu-item" data-target="day2-section">第二天行程</button>
+        </div>
+    </div>
+
+    <!-- 第一天行程板块（默认激活显示） -->
+    <div id="day1-section" class="trip-section active">
+        <!-- 【醒目预约提醒】放在板块最顶部 -->
+        <div class="reserve-alert">
+            <h3>⚠️ 本行程需预约景点（必看！）</h3>
+            <p>1. <span>橘子洲景区</span>：免费不免票，提前3天在【岳麓山橘子洲旅游区】公众号预约</p>
+            <p>2. 预约时段：分时段入园，建议选12:00-17:00，凭身份证/预约码入园</p>
+            <p>3. 观光小火车：现场购票（往返40元），节假日建议提前排队</p>
+        </div>
+
+        <div class="sub-section">
+            <div class="overview-card">
+                <p>核心主题：商圈逛吃+地标打卡</p>
+                <p>总交通费：约50元（地铁+橘子洲观光车）</p>
+                <p>用餐：人均80-100元</p>
+                <p>住宿：五一广场国金街轻居酒店</p>
+            </div>
+
+            <h3>一、 行程明细</h3>
+            <div class="table-wrap">
+                <table class="trip-table">
+                    <thead>
+                        <tr>
+                            <th>时间段</th>
+                            <th>行程节点</th>
+                            <th>交通方式</th>
+                            <th>耗时</th>
+                            <th>费用</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>13:44-14:04</td>
+                            <td>长沙南站 → 五一广场站</td>
+                            <td>地铁2号线（梅溪湖西方向）</td>
+                            <td class="highlight">约20分钟</td>
+                            <td class="highlight">4元</td>
+                        </tr>
+                        <tr>
+                            <td>14:04-14:09</td>
+                            <td>五一广场站 → 酒店</td>
+                            <td>步行（1号口出，黄兴中路）</td>
+                            <td class="highlight">约5分钟</td>
+                            <td class="highlight">免费</td>
+                        </tr>
+                        <tr>
+                            <td>14:09-14:39</td>
+                            <td>酒店收拾行李+休整</td>
+                            <td>-</td>
+                            <td class="highlight">约30分钟</td>
+                            <td class="highlight">免费</td>
+                        </tr>
+                        <tr>
+                            <td>14:39-14:44</td>
+                            <td>酒店 → IFS国金中心</td>
+                            <td>步行（黄兴中路往北）</td>
+                            <td class="highlight">约5分钟</td>
+                            <td class="highlight">免费</td>
+                        </tr>
+                        <tr>
+                            <td>14:44-15:44</td>
+                            <td>IFS国金中心打卡</td>
+                            <td>步行（院内游览+拍照）</td>
+                            <td class="highlight">约1小时</td>
+                            <td class="highlight">免费</td>
+                        </tr>
+                        <tr>
+                            <td>15:44-15:59</td>
+                            <td>IFS → 橘子洲站</td>
+                            <td>步行+地铁2号线（光达方向）</td>
+                            <td class="highlight">约15分钟</td>
+                            <td class="highlight">3元</td>
+                        </tr>
+                        <tr>
+                            <td>15:59-16:09</td>
+                            <td>橘子洲站 → 青年毛泽东雕像</td>
+                            <td>观光小火车（往返）</td>
+                            <td class="highlight">约10分钟</td>
+                            <td class="highlight">40元</td>
+                        </tr>
+                        <tr>
+                            <td>16:09-17:09</td>
+                            <td>橘子洲头游玩</td>
+                            <td>步行（雕像周边打卡+湘江风光）</td>
+                            <td class="highlight">约1小时</td>
+                            <td class="highlight">免费</td>
+                        </tr>
+                        <tr>
+                            <td>17:09-17:34</td>
+                            <td>橘子洲站 → 黄兴广场站</td>
+                            <td>地铁2号线（梅溪湖西方向）</td>
+                            <td class="highlight">约25分钟</td>
+                            <td class="highlight">3元</td>
+                        </tr>
+                        <tr>
+                            <td>17:34-17:42</td>
+                            <td>黄兴广场站 → 林小兜有钳</td>
+                            <td>步行（坡子街方向）</td>
+                            <td class="highlight">约8分钟</td>
+                            <td class="highlight">免费</td>
+                        </tr>
+                        <tr>
+                            <td>17:42-19:12</td>
+                            <td>林小兜有钳用餐</td>
+                            <td>-</td>
+                            <td class="highlight">约1.5小时</td>
+                            <td class="highlight">人均80元</td>
+                        </tr>
+                        <tr>
+                            <td>19:12-20:42</td>
+                            <td>黄兴南路步行街逛吃</td>
+                            <td>步行（全程游览+小吃）</td>
+                            <td class="highlight">约1.5小时</td>
+                            <td class="highlight">人均50元（可选）</td>
+                        </tr>
+                        <tr>
+                            <td>20:42-20:52</td>
+                            <td>步行街 → 酒店</td>
+                            <td>步行（黄兴中路往北）</td>
+                            <td class="highlight">约10分钟</td>
+                            <td class="highlight">免费</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="sub-section">
+            <h3>二、 核心打卡点</h3>
+            <ul>
+                <li>IFS国金中心：7楼空中花园（KAWS雕像打卡）</li>
+                <li>橘子洲头：青年毛泽东雕像（湘江地标，建议傍晚拍照）</li>
+                <li>黄兴南路步行街：长沙核心商圈，逛吃+夜景打卡</li>
+                <li>林小兜有钳：坡子街附近特色餐厅，主打海鲜钳类</li>
+            </ul>
+        </div>
+
+        <div class="sub-section">
+            <h3>三、 当日实用贴士</h3>
+            <ul>
+                <li>橘子洲观光小火车现场购票即可，节假日建议下午4点后错峰前往</li>
+                <li>IFS KAWS雕像打卡需排队，建议提前预留15分钟</li>
+                <li>茶颜悦色步行街门店密集，可随时购买，支持免费续杯茶底</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 第二天行程板块（默认隐藏） -->
+    <div id="day2-section" class="trip-section">
+        <!-- 【醒目预约提醒】放在板块最顶部 -->
+        <div class="reserve-alert">
+            <h3>⚠️ 本行程需预约景点（必看！）</h3>
+            <p>1. <span>岳麓山景区</span>：免费不免票，提前3天在【岳麓山橘子洲旅游区】公众号预约</p>
+            <p>2. <span>岳麓书院</span>：收费景点（40元/人），需单独在【岳麓书院】公众号预约购票</p>
+            <p>3. 关键提醒：岳麓书院学生半价，老人免费，9点前到避开人流高峰</p>
+        </div>
+
+        <div class="sub-section">
+            <div class="overview-card">
+                <p>核心主题：岳麓山文化风光+老长沙网红/特色打卡</p>
+                <p>总交通费：约25元（地铁+岳麓山观光车）</p>
+                <p>用餐：人均80-100元（湖南大学小吃+火宫殿特色小吃）</p>
+                <p>游玩时长：约9小时（上午9点出发，自由活动结束后返程）</p>
+            </div>
+
+            <h3>一、 行程明细</h3>
+            <div class="table-wrap">
+                <table class="trip-table">
+                    <thead>
+                        <tr>
+                            <th>时间段</th>
+                            <th>行程节点</th>
+                            <th>交通方式</th>
+                            <th>耗时</th>
+                            <th>费用</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>08:30-09:00</td>
+                            <td>酒店 → 早餐店（太平街附近）</td>
+                            <td>步行（黄兴中路往南，约6分钟）</td>
+                            <td class="highlight">约30分钟（含用餐）</td>
+                            <td class="highlight">人均10元</td>
+                        </tr>
+                        <tr>
+                            <td>09:00-09:25</td>
+                            <td>太平街 → 溁湾镇站（岳麓山入口）</td>
+                            <td>地铁2号线（梅溪湖西方向）</td>
+                            <td class="highlight">约25分钟</td>
+                            <td class="highlight">3元</td>
+                        </tr>
+                        <tr>
+                            <td>09:25-09:40</td>
+                            <td>溁湾镇站 → 岳麓山东门（观光车起点）</td>
+                            <td>步行（3号口出，往南约15分钟）</td>
+                            <td class="highlight">约15分钟</td>
+                            <td class="highlight">免费</td>
+                        </tr>
+                        <tr>
+                            <td>09:40-10:00</td>
+                            <td>岳麓山东门 → 岳麓书院/爱晚亭</td>
+                            <td>岳麓山观光车（东线，单程）</td>
+                            <td class="highlight">约20分钟</td>
+                            <td class="highlight">20元</td>
+                        </tr>
+                        <tr>
+                            <td>10:00-11:30</td>
+                            <td>岳麓书院游玩（人文打卡）</td>
+                            <td>步行（院内游览）</td>
+                            <td class="highlight">约1.5小时</td>
+                            <td class="highlight">40元（学生半价）</td>
+                        </tr>
+                        <tr>
+                            <td>11:30-12:00</td>
+                            <td>岳麓书院 → 爱晚亭</td>
+                            <td>步行（书院后门林间小道）</td>
+                            <td class="highlight">约30分钟</td>
+                            <td class="highlight">免费</td>
+                        </tr>
+                        <tr>
+                            <td>12:00-12:30</td>
+                            <td>爱晚亭 → 湖南大学小吃街</td>
+                            <td>步行（下山往南，约30分钟）</td>
+                            <td class="highlight">约30分钟</td>
+                            <td class="highlight">免费</td>
+                        </tr>
+                        <tr>
+                            <td>12:30-14:00</td>
+                            <td>湖南大学小吃街用餐+打卡</td>
+                            <td>步行（逛吃+东方红广场打卡）</td>
+                            <td class="highlight">约1.5小时</td>
+                            <td class="highlight">人均60-80元</td>
+                        </tr>
+                        <tr>
+                            <td>14:00-15:30</td>
+                            <td>湖南大学 → 岳麓山南大门（风光打卡）</td>
+                            <td>步行（登高路往南，老建筑打卡）</td>
+                            <td class="highlight">约1.5小时</td>
+                            <td class="highlight">免费</td>
+                        </tr>
+                        <tr>
+                            <td>15:30-16:10</td>
+                            <td>岳麓山南大门 → 潮宗街（复古电视网红墙）</td>
+                            <td>打车（直达湘院子门口）</td>
+                            <td class="highlight">约40分钟</td>
+                            <td class="highlight">20元（人均5-10元）</td>
+                        </tr>
+                        <tr>
+                            <td>16:10-16:30</td>
+                            <td>潮宗街复古电视网红墙打卡</td>
+                            <td>步行（湘院子门口拍照+逛潮宗街）</td>
+                            <td class="highlight">约20分钟</td>
+                            <td class="highlight">免费</td>
+                        </tr>
+                        <tr>
+                            <td>16:30-16:50</td>
+                            <td>潮宗街 → 太平街</td>
+                            <td>步行（穿五一广场，约20分钟）</td>
+                            <td class="highlight">约20分钟</td>
+                            <td class="highlight">免费</td>
+                        </tr>
+                        <tr>
+                            <td>16:50-17:20</td>
+                            <td>太平街 → 坡子街「火宫殿」打卡+小吃</td>
+                            <td>步行（太平街南端往西南，约5分钟）</td>
+                            <td class="highlight">约30分钟（含打卡+尝小吃）</td>
+                            <td class="highlight">人均20-30元</td>
+                        </tr>
+                        <tr>
+                            <td>17:20-17:30</td>
+                            <td>火宫殿 → 坡子街派出所打卡</td>
+                            <td>步行（火后街方向，约5分钟）</td>
+                            <td class="highlight">约10分钟（打卡拍照）</td>
+                            <td class="highlight">免费</td>
+                        </tr>
+                        <tr>
+                            <td>17:30-结束</td>
+                            <td>坡子街/太平街逛吃+伴手礼采购+自由活动</td>
+                            <td>步行（全程游览，灵活延长）</td>
+                            <td class="highlight">时间灵活可控</td>
+                            <td class="highlight">人均100元（可选）</td>
+                        </tr>
+                        <tr>
+                            <td>自由活动后-返程</td>
+                            <td>坡子街/太平街 → 酒店</td>
+                            <td>步行（往北约10-15分钟）</td>
+                            <td class="highlight">约15分钟</td>
+                            <td class="highlight">免费</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="sub-section">
+            <h3>二、 重点打卡点细节</h3>
+            <ul>
+                <li>潮宗街复古电视网红墙：开福区潮宗街湘院子门口，下午4点光线柔和出片，可顺带逛周边复古咖啡馆。</li>
+                <li>坡子街火宫殿：天心区坡子街，单点糖油粑粑、臭豆腐即可，门口牌坊为经典打卡点，无需吃正餐。</li>
+                <li>坡子街派出所：天心区火后街14号，距火宫殿步行5分钟，文明打卡不影响办公，快速拍照留念即可。</li>
+                <li>岳麓书院：提前1天预约，中国古代四大书院之一，院内古建和碑刻极具人文价值。</li>
+            </ul>
+        </div>
+
+        <div class="sub-section">
+            <h3>三、 自由活动推荐方向</h3>
+            <ul>
+                <li>逛吃延长：从坡子街步行至超级文和友（海信广场店）拍复古大片，车程约10分钟。</li>
+                <li>伴手礼采购：太平街买茶颜悦色周边、坡子街买真空酱板鸭，性价比高且品类全。</li>
+                <li>休闲返程：直接从坡子街步行回酒店，缓解爬山+步行疲劳。</li>
+                <li>小众打卡：从太平街步行至贾谊故居，感受老长沙历史底蕴，步行约5分钟，免费参观。</li>
+            </ul>
+        </div>
+
+        <div class="sub-section">
+            <h3>四、 当日实用贴士</h3>
+            <ul>
+                <li>岳麓书院需提前1天在「岳麓山橘子洲旅游区」公众号预约，节假日限流建议9点前到。</li>
+                <li>岳麓山南大门至潮宗街建议用网约车，高峰期预留5分钟缓冲时间。</li>
+                <li>网红墙和派出所打卡时，文明拍照，不影响商家和办公秩序。</li>
+                <li>爬山建议穿舒适运动鞋，提前准备便携水杯和少量零食。</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 切换逻辑JavaScript -->
+    <script>
+        // 获取所有菜单按钮和行程板块
+        const menuItems = document.querySelectorAll('.menu-item');
+        const tripSections = document.querySelectorAll('.trip-section');
+
+        // 给每个菜单按钮绑定点击事件
+        menuItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // 1. 获取当前菜单对应的目标板块ID
+                const targetId = this.getAttribute('data-target');
+
+                // 2. 移除所有菜单的active类（取消高亮）
+                menuItems.forEach(menu => menu.classList.remove('active'));
+                // 给当前点击的菜单添加active类（高亮）
+                this.classList.add('active');
+
+                // 3. 移除所有行程板块的active类（隐藏所有）
+                tripSections.forEach(section => section.classList.remove('active'));
+                // 给目标板块添加active类（显示对应行程）
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

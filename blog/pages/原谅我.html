@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <!-- 强化手机端视口适配，禁止缩放，适配各种手机屏幕 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- 适配手机端状态栏（避免内容被状态栏遮挡） -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>对不起呀</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 页面背景，渐变+轻微动效，手机端隐藏滚动条 */
+        body {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(120deg, #fddb92, #d1fdff, #fbc2eb);
+            background-size: 200% 200%;
+            animation: bgMove 10s ease infinite;
+            overflow: hidden;
+            font-family: "Microsoft YaHei", sans-serif;
+            /* 手机端触摸反馈优化 */
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* 背景渐变动效 */
+        @keyframes bgMove {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* 道歉卡片：优化手机端尺寸和内边距 */
+        .apology-card {
+            width: 92%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px 25px; /* 手机端减少内边距，避免超出屏幕 */
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            z-index: 10;
+            /* 手机端卡片轻微上浮，避免贴边 */
+            margin: 0 auto;
+        }
+
+        /* 标题样式：优化手机端字体大小 */
+        .apology-card h1 {
+            color: #e63946;
+            font-size: 24px; /* 手机端适当缩小标题 */
+            margin-bottom: 18px;
+        }
+
+        /* 道歉文案样式：优化手机端字体和行高 */
+        .apology-card p {
+            color: #333;
+            font-size: 16px; /* 手机端适配阅读字体 */
+            line-height: 1.7;
+            margin-bottom: 25px;
+        }
+
+        /* 按钮组：默认横向，手机端窄屏纵向排列 */
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap; /* 防止按钮挤压 */
+        }
+
+        /* 通用按钮样式：优化手机端点击区域大小 */
+        .btn {
+            padding: 12px 28px; /* 保证手机端点击区域足够大 */
+            border: none;
+            border-radius: 30px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            /* 手机端按钮最小宽度，避免文字折行 */
+            min-width: 120px;
+        }
+
+        /* 接受道歉按钮（绿色） */
+        .accept-btn {
+            background: #2a9d8f;
+            color: white;
+        }
+
+        .accept-btn:hover {
+            background: #21867a;
+            transform: scale(1.05);
+        }
+
+        /* 返回主页按钮（橙色，与页面主题色呼应） */
+        .home-btn {
+            background: #ff8a65;
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .home-btn:hover {
+            background: #ff7043;
+            transform: scale(1.05);
+        }
+
+        /* 不接受按钮（灰色）：优化手机端定位 */
+        .refuse-btn {
+            background: #9d9d9d;
+            color: white;
+            position: relative;
+        }
+
+        /* 爱心飘落样式：优化手机端爱心大小 */
+        .heart {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: #e63946;
+            transform: rotate(45deg);
+            opacity: 0.7;
+            z-index: 1;
+            animation: heartFall linear infinite;
+        }
+
+        /* 爱心伪元素，组成完整爱心形状 */
+        .heart::before, .heart::after {
+            content: "";
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: #e63946;
+            border-radius: 50%;
+        }
+
+        .heart::before {
+            top: -8px;
+            left: 0;
+        }
+
+        .heart::after {
+            top: 0;
+            left: -8px;
+        }
+
+        /* 爱心飘落动画：优化手机端飘落节奏 */
+        @keyframes heartFall {
+            0% {
+                top: -10%;
+                transform: rotate(45deg) translateX(0);
+                opacity: 0.7;
+            }
+            100% {
+                top: 110%;
+                transform: rotate(45deg) translateX(calc(50px * var(--dir, 1)));
+                opacity: 0;
+            }
+        }
+
+        /* 接受道歉后的提示样式：优化手机端尺寸 */
+        .success-tip {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(42, 157, 143, 0.95);
+            color: white;
+            padding: 40px 60px; /* 手机端缩小内边距 */
+            border-radius: 20px;
+            font-size: 20px; /* 手机端缩小提示字体 */
+            display: none;
+            z-index: 100;
+            text-align: center;
+        }
+
+        /* 媒体查询：适配小屏手机（宽度小于375px），按钮纵向排列 */
+        @media (max-width: 375px) {
+            .btn-group {
+                flex-direction: column; /* 纵向排列按钮 */
+                align-items: center;
+                gap: 12px;
+            }
+
+            .apology-card p {
+                font-size: 15px;
+            }
+
+            .success-tip {
+                padding: 30px 40px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 道歉卡片 -->
+    <div class="apology-card">
+        <h1>对不起，我错了 😭</h1>
+        <p>
+            原谅我这一次好不好？<br>
+            我不该惹你生气，不该固执己见，不该忽略你的感受。<br>
+            以后我一定好好听你的话，再也不犯同样的错了，求求你原谅我～
+        </p>
+        <div class="btn-group">
+            <a href="index.html" class="btn home-btn">返回主页</a>
+            <button class="btn accept-btn">接受道歉</button>
+            <button class="btn refuse-btn">不接受</button>
+        </div>
+    </div>
+
+    <!-- 接受成功提示 -->
+    <div class="success-tip" id="successTip">
+        太好了！爱你哟 ❤️
+    </div>
+
+    <script>
+        // 1. 获取元素
+        const refuseBtn = document.querySelector('.refuse-btn');
+        const acceptBtn = document.querySelector('.accept-btn');
+        const successTip = document.getElementById('successTip');
+        const card = document.querySelector('.apology-card');
+
+        // 2. 适配手机+电脑："不接受"按钮躲避效果（补充手机触摸事件）
+        function avoidBtn() {
+            // 卡片的宽高和位置
+            const cardRect = card.getBoundingClientRect();
+            // 按钮的宽高
+            const btnWidth = refuseBtn.offsetWidth;
+            const btnHeight = refuseBtn.offsetHeight;
+
+            // 随机生成新位置（在卡片内，适配手机端边界）
+            const randomX = Math.floor(Math.random() * (cardRect.width - btnWidth - 20)) + 10;
+            const randomY = Math.floor(Math.random() * (cardRect.height - btnHeight - 70)) + 35;
+
+            // 设置按钮新位置
+            refuseBtn.style.position = 'absolute';
+            refuseBtn.style.left = randomX + 'px';
+            refuseBtn.style.top = randomY + 'px';
+        }
+
+        // 电脑端：鼠标悬浮触发
+        refuseBtn.addEventListener('mouseover', avoidBtn);
+        // 手机端：触摸开始触发（核心适配，解决手机上无法躲避的问题）
+        refuseBtn.addEventListener('touchstart', function(e) {
+            // 阻止默认触摸事件，避免页面滚动
+            e.preventDefault();
+            avoidBtn();
+        });
+
+        // 3. "接受道歉"按钮点击/触摸效果（适配手机）
+        acceptBtn.addEventListener('click', function() {
+            card.style.display = 'none';
+            successTip.style.display = 'block';
+
+            // 3秒后关闭提示
+            setTimeout(() => {
+                successTip.style.display = 'none';
+            }, 3000);
+        });
+
+        // 4. 生成随机飘落的爱心（适配手机屏幕尺寸）
+        function createHearts() {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+
+            // 优化手机端爱心大小、飘落节奏
+            const size = Math.random() * 12 + 8; // 爱心大小：8-20px（适配手机）
+            const left = Math.random() * 100; // 左侧位置：0-100vw
+            const duration = Math.random() * 8 + 8; // 飘落时长：8-16秒（手机端稍快）
+
+            // 给爱心设置样式
+            heart.style.width = size + 'px';
+            heart.style.height = size + 'px';
+            heart.style.left = left + 'vw';
+            heart.style.animationDuration = duration + 's';
+            // 随机左右偏移方向，让爱心飘落更自然
+            heart.style.setProperty('--dir', Math.random() > 0.5 ? 1 : -1);
+
+            // 添加到页面
+            document.body.appendChild(heart);
+
+            // 爱心落地后移除，避免手机端卡顿
+            setTimeout(() => {
+                heart.remove();
+            }, duration * 1000);
+        }
+
+        // 每隔350毫秒生成一个爱心（手机端稍慢，减少性能消耗）
+        setInterval(createHearts, 350);
+    </script>
+</body>
+</html>
