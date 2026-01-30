@@ -16,7 +16,12 @@
     <!-- 顶部导航栏 -->
     <nav class="navbar">
         <div class="nav-brand">Linwan</div>
-        <div class="nav-links">
+        <button class="hamburger" id="hamburger" aria-label="切换菜单">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div class="nav-links" id="navLinks">
             <a href="#home">首页</a>
             <a href="#projects">项目</a>
             <a href="#blog">博客</a>
@@ -25,9 +30,10 @@
                 <span class="icon">🌙</span>
                 <span class="text">深色</span>
             </button>
+            <a href="profile.html" title="进入个人主页">
+                <img src="../assets/images/头像.png" alt="个人头像" class="avatar">
+            </a>
         </div>
-        <!-- 头像嵌入导航栏 - 移出nav-links容器 -->
-        <img src="../assets/images/头像.png" alt="个人头像" class="avatar">
     </nav>
 
     <!-- 科技风背景板 -->
@@ -97,6 +103,28 @@
 
     <!-- 日夜切换和滚动动画脚本 -->
     <script>
+        // 汉堡菜单功能
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('navLinks');
+
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        // 点击导航链接后关闭菜单
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+            });
+        });
+
+        // 点击页面其他区域关闭菜单
+        document.addEventListener('click', (e) => {
+            if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
+                navLinks.classList.remove('active');
+            }
+        });
+
         // 日夜切换功能
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = themeToggle.querySelector('.icon');

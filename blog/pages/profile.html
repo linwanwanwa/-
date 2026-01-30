@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人主页 - Linwan</title>
+    <!-- 预加载关键资源 -->
+    <link rel="preload" href="../assets/css/styles.css" as="style">
+    <link rel="preload" href="../assets/images/头像.png" as="image">
+    <!-- 引入外部CSS文件 -->
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <!-- 异步加载Font Awesome图标 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'">
+    <style>
+        /* 个人主页特有样式 */
+        .profile-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 120px 40px 60px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 个人信息卡片 */
+        .profile-header {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+            border: var(--hand-drawn-border);
+            box-shadow: var(--hand-drawn-shadow);
+            transform: rotate(-0.3deg);
+            transition: all 0.3s ease;
+        }
+
+        .profile-header:hover {
+            transform: rotate(0.3deg) scale(1.02);
+            box-shadow: 4px 4px 0 rgba(0,0,0,0.3);
+        }
+
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 4px solid var(--accent-cyan);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            margin: 0 auto 20px;
+            object-fit: cover;
+            transition: all 0.3s ease;
+        }
+
+        .profile-avatar:hover {
+            transform: rotate(10deg) scale(1.1);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+        }
+
+        .profile-name {
+            font-size: 2.5rem;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            font-family: var(--hand-drawn-font-alt);
+        }
+
+        .profile-title {
+            font-size: 1.2rem;
+            color: var(--accent-cyan);
+            margin-bottom: 20px;
+        }
+
+        .profile-bio {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            max-width: 600px;
+            margin: 0 auto 20px;
+        }
+
+        .profile-social {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .profile-social a {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .profile-social a:hover {
+            background: var(--accent-cyan);
+            color: #fff;
+            transform: translateY(-5px) rotate(10deg);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.3);
+        }
+
+        /* 技能模块 */
+        .skills-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+            border: var(--hand-drawn-border);
+            box-shadow: var(--hand-drawn-shadow);
+            transform: rotate(0.2deg);
+            transition: all 0.3s ease;
+        }
+
+        .skills-section:hover {
+            transform: rotate(-0.2deg) scale(1.01);
+            box-shadow: 4px 4px 0 rgba(0,0,0,0.3);
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: 30px;
+            text-align: center;
+            font-family: var(--hand-drawn-font);
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: var(--accent-cyan);
+            border-radius: 2px;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .skill-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skill-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--accent-cyan);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .skill-item:hover::before {
+            transform: scaleX(1);
+        }
+
+        .skill-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.2);
+            border-color: var(--accent-cyan);
+        }
+
+        .skill-icon {
+            font-size: 2.5rem;
+            color: var(--accent-cyan);
+            margin-bottom: 10px;
+        }
+
+        .skill-name {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .skill-level {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* 经历模块 */
+        .experience-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+            border: var(--hand-drawn-border);
+            box-shadow: var(--hand-drawn-shadow);
+            transform: rotate(-0.2deg);
+            transition: all 0.3s ease;
+        }
+
+        .experience-section:hover {
+            transform: rotate(0.2deg) scale(1.01);
+            box-shadow: 4px 4px 0 rgba(0,0,0,0.3);
+        }
+
+        .experience-item {
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 3px solid var(--accent-cyan);
+            background: var(--card-bg);
+            border-radius: 0 10px 10px 0;
+            transition: all 0.3s ease;
+        }
+
+        .experience-item:hover {
+            transform: translateX(10px);
+            box-shadow: -5px 5px 15px rgba(0, 255, 255, 0.1);
+        }
+
+        .experience-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .experience-title {
+            font-size: 1.3rem;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .experience-company {
+            font-size: 1rem;
+            color: var(--accent-cyan);
+            margin-bottom: 5px;
+        }
+
+        .experience-date {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .experience-desc {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* 兴趣爱好模块 */
+        .interests-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+            border: var(--hand-drawn-border);
+            box-shadow: var(--hand-drawn-shadow);
+            transform: rotate(0.2deg);
+            transition: all 0.3s ease;
+        }
+
+        .interests-section:hover {
+            transform: rotate(-0.2deg) scale(1.01);
+            box-shadow: 4px 4px 0 rgba(0,0,0,0.3);
+        }
+
+        .interests-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .interest-tag {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .interest-tag:hover {
+            background: var(--accent-cyan);
+            color: #fff;
+            transform: translateY(-3px) rotate(2deg);
+            box-shadow: 0 3px 10px rgba(0, 255, 255, 0.2);
+        }
+
+        /* 返回按钮 */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 30px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-family: var(--hand-drawn-font);
+            transform: rotate(-0.5deg);
+            margin-top: 20px;
+        }
+
+        .back-btn:hover {
+            background: var(--accent-cyan);
+            color: #fff;
+            transform: rotate(0.5deg) translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.3);
+        }
+
+        /* 响应式适配 */
+        @media (max-width: 768px) {
+            .profile-container {
+                padding: 100px 20px 60px;
+            }
+
+            .profile-header {
+                padding: 30px 20px;
+            }
+
+            .profile-avatar {
+                width: 120px;
+                height: 120px;
+            }
+
+            .profile-name {
+                font-size: 2rem;
+            }
+
+            .profile-title {
+                font-size: 1rem;
+            }
+
+            .skills-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
+            }
+
+            .skills-section, .experience-section, .interests-section {
+                padding: 30px 20px;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="navbar">
+        <div class="nav-brand">Linwan</div>
+        <button class="hamburger" id="hamburger" aria-label="切换菜单">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div class="nav-links" id="navLinks">
+            <a href="index.html">首页</a>
+            <a href="#skills">技能</a>
+            <a href="#experience">经历</a>
+            <a href="#interests">兴趣</a>
+            <button class="theme-toggle" id="themeToggle">
+                <span class="icon">🌙</span>
+                <span class="text">深色</span>
+            </button>
+            <img src="../assets/images/头像.png" alt="个人头像" class="avatar">
+        </div>
+    </nav>
+
+    <!-- 科技风背景板 -->
+    <div class="tech-background"></div>
+
+    <div class="profile-container">
+        <!-- 个人信息卡片 -->
+        <div class="profile-header fade-in delay-1">
+            <img src="../assets/images/头像.png" alt="个人头像" class="profile-avatar">
+            <h1 class="profile-name">Linwan</h1>
+            <p class="profile-title">全栈开发者 & 技术爱好者</p>
+            <p class="profile-bio">
+                热爱编程，喜欢探索新技术。专注于Web开发，擅长前端和后端技术。
+                相信技术可以改变世界，用代码创造价值。
+            </p>
+            <div class="profile-social">
+                <a href="https://github.com/linwanwanwa" target="_blank" title="GitHub">
+                    <i class="fa fa-github"></i>
+                </a>
+                <a href="mailto:1793004324@qq.com" title="邮箱">
+                    <i class="fa fa-envelope-o"></i>
+                </a>
+                <a href="https://weibo.com/your-name" target="_blank" title="微博">
+                    <i class="fa fa-weibo"></i>
+                </a>
+                <a href="tel:15327412390" title="电话">
+                    <i class="fa fa-phone"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 技能模块 -->
+        <div class="skills-section fade-in delay-2" id="skills">
+            <h2 class="section-title">专业技能</h2>
+            <div class="skills-grid">
+                <div class="skill-item">
+                    <div class="skill-icon"><i class="fa fa-html5"></i></div>
+                    <h3 class="skill-name">HTML/CSS</h3>
+                    <p class="skill-level">熟练</p>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-icon"><i class="fa fa-js"></i></div>
+                    <h3 class="skill-name">JavaScript</h3>
+                    <p class="skill-level">熟练</p>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-icon"><i class="fa fa-python"></i></div>
+                    <h3 class="skill-name">Python</h3>
+                    <p class="skill-level">掌握</p>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-icon"><i class="fa fa-database"></i></div>
+                    <h3 class="skill-name">数据库</h3>
+                    <p class="skill-level">掌握</p>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-icon"><i class="fa fa-git"></i></div>
+                    <h3 class="skill-name">Git</h3>
+                    <p class="skill-level">熟练</p>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-icon"><i class="fa fa-code"></i></div>
+                    <h3 class="skill-name">后端开发</h3>
+                    <p class="skill-level">掌握</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 经历模块 -->
+        <div class="experience-section fade-in delay-3" id="experience">
+            <h2 class="section-title">个人经历</h2>
+            <div class="experience-item">
+                <h3 class="experience-title">全栈开发工程师</h3>
+                <p class="experience-company">个人项目</p>
+                <p class="experience-date">2023 - 至今</p>
+                <p class="experience-desc">
+                    独立开发和维护个人博客项目，负责前端页面设计、后端API开发、数据库设计等工作。
+                    持续学习新技术，提升开发能力。
+                </p>
+            </div>
+            <div class="experience-item">
+                <h3 class="experience-title">技术爱好者</h3>
+                <p class="experience-company">自学</p>
+                <p class="experience-date">2020 - 至今</p>
+                <p class="experience-desc">
+                    通过在线课程和项目实践，系统学习了Web开发相关知识。
+                    参与开源项目，与社区交流学习。
+                </p>
+            </div>
+        </div>
+
+        <!-- 兴趣爱好模块 -->
+        <div class="interests-section fade-in delay-4" id="interests">
+            <h2 class="section-title">兴趣爱好</h2>
+            <div class="interests-list">
+                <span class="interest-tag">编程</span>
+                <span class="interest-tag">阅读</span>
+                <span class="interest-tag">旅行</span>
+                <span class="interest-tag">摄影</span>
+                <span class="interest-tag">音乐</span>
+                <span class="interest-tag">游戏</span>
+                <span class="interest-tag">开源</span>
+                <span class="interest-tag">技术分享</span>
+            </div>
+        </div>
+
+        <!-- 返回按钮 -->
+        <div style="text-align: center;">
+            <a href="index.html" class="back-btn fade-in delay-5">
+                <i class="fa fa-arrow-left"></i>
+                返回首页
+            </a>
+        </div>
+    </div>
+
+    <!-- 日夜切换和滚动动画脚本 -->
+    <script>
+        // 汉堡菜单功能
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('navLinks');
+
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        // 点击导航链接后关闭菜单
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+            });
+        });
+
+        // 点击页面其他区域关闭菜单
+        document.addEventListener('click', (e) => {
+            if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
+                navLinks.classList.remove('active');
+            }
+        });
+
+        // 日夜切换功能
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('.icon');
+        const themeText = themeToggle.querySelector('.text');
+
+        // 检查本地存储的主题设置
+        const savedTheme = localStorage.getItem('theme');
+        
+        // 自动检测系统主题偏好
+        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+
+        // 设置主题函数
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            
+            if (theme === 'light') {
+                themeIcon.textContent = '☀️';
+                themeText.textContent = '浅色';
+            } else {
+                themeIcon.textContent = '🌙';
+                themeText.textContent = '深色';
+            }
+        }
+
+        // 初始化主题
+        function initTheme() {
+            if (savedTheme) {
+                setTheme(savedTheme);
+            } else if (prefersDarkScheme.matches) {
+                setTheme('dark');
+            } else {
+                setTheme('light');
+            }
+        }
+
+        // 监听主题切换按钮点击
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            setTheme(newTheme);
+        });
+
+        // 监听系统主题变化
+        prefersDarkScheme.addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                setTheme(e.matches ? 'dark' : 'light');
+            }
+        });
+
+        // 初始化主题
+        initTheme();
+
+        // 使用Intersection Observer API优化滚动动画性能
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        // 为所有fade-in元素添加观察器
+        document.querySelectorAll('.fade-in').forEach(element => {
+            observer.observe(element);
+        });
+    </script>
+</body>
+</html>
